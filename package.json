@@ -10,6 +10,10 @@
     "directus-extension",
     "directus-custom-hook"
   ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "directus:extension": {
     "type": "hook",
     "path": "dist/index.js",
@@ -17,7 +21,7 @@
     "host": "^9.22.4"
   },
   "scripts": {
-    "build": "directus-extension build",
+    "prepack": "directus-extension build",
     "dev": "directus-extension build -w --no-minify",
     "link": "directus-extension link"
   },
