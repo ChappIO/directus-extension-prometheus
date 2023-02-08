@@ -4,6 +4,7 @@
   "icon": "extension",
   "version": "1.0.0",
   "license": "MIT",
+  "homepage": "https://github.com/chappio/directus-extension-prometheus",
   "keywords": [
     "directus",
     "directus-extension",
