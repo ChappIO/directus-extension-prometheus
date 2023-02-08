@@ -8,8 +8,15 @@
   "keywords": [
     "directus",
     "directus-extension",
-    "directus-custom-hook"
+    "directus-custom-hook",
+    "prometheus",
+    "metrics",
+    "analytics"
   ],
+  "author": {
+    "name": "Thomas Biesart",
+    "url": "https://github.com/chappio"
+  },
   "files": [
     "dist",
     "README.md"
