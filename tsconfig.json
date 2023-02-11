@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"target": "ES2019",
 		"lib": ["ES2019", "DOM"],
-		"moduleResolution": "node",
+		"moduleResolution": "NodeNext",
+		"module": "CommonJS",
 		"strict": true,
 		"noFallthroughCasesInSwitch": true,
 		"esModuleInterop": true,
@@ -24,6 +25,7 @@
 		"isolatedModules": true,
 		"rootDir": "./src",
 		"declaration": true,
+		"outDir": "dist"
 	},
 	"include": [
       "./src/**/*.ts"

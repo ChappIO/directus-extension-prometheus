@@ -2,21 +2,22 @@ import {defineHook} from '@directus/extensions-sdk';
 import {Counter, Gauge, Histogram, Registry} from "prom-client";
 import {NextFunction, Request, Response} from "express";
 
-export default defineHook(({init}, {services, getSchema, database, env}) => {
+const globalRegister = new Registry();
+
+const hook = defineHook(({init}, {services, getSchema, database, env}) => {
     const PROMETHEUS_METRICS_ENDPOINT = env.PROMETHEUS_METRICS_ENDPOINT || '/metrics';
-    const register = new Registry();
 
     init('app.before', async ({app}) => {
         const requestCount = new Counter({
             name: 'directus_request_count',
             help: 'The total number of http requests',
-            registers: [register],
+            registers: [globalRegister],
             labelNames: ['method', 'status']
         });
         const requestDuration = new Histogram({
             name: 'directus_request_duration_seconds',
             help: 'The total duration of http requests',
-            registers: [register],
+            registers: [globalRegister],
             labelNames: ['method', 'status']
         });
         app.use('/', (req: Request, res: Response, next: NextFunction) => {
@@ -56,7 +57,7 @@ export default defineHook(({init}, {services, getSchema, database, env}) => {
         const collectionSize = new Gauge({
             name: 'directus_collection_size',
             help: 'The total number of items in each collection',
-            registers: [register],
+            registers: [globalRegister],
             labelNames: ['collection']
         });
 
@@ -75,8 +76,8 @@ export default defineHook(({init}, {services, getSchema, database, env}) => {
                 )
 
                 await Promise.all(jobs);
-                res.set('Content-Type', register.contentType);
-                res.send(await register.metrics());
+                res.set('Content-Type', globalRegister.contentType);
+                res.send(await globalRegister.metrics());
             } catch (e) {
                 console.error(e);
                 next(e);
@@ -84,3 +85,8 @@ export default defineHook(({init}, {services, getSchema, database, env}) => {
         });
     });
 });
+
+module.exports = {
+    default: hook,
+    globalRegister: globalRegister,
+}

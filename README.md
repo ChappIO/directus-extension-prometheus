@@ -20,7 +20,7 @@ metrics on the /metrics endpoint.
 |-------------------------------|-----------------------------------------------------------|--------------|
 | `PROMETHEUS_METRICS_ENDPOINT` | The endpoint on which the prometheus metrics are exposed. | `"/metrics"` |
 
-## Metrics
+## Default Metrics
 
 Here is an example of the types of metrics exposed by this extension:
 
@@ -115,4 +115,34 @@ directus_collection_size{collection="directus_shares"} 0
 directus_collection_size{collection="directus_flows"} 0
 directus_collection_size{collection="directus_operations"} 0
 directus_collection_size{collection="thing"} 0
+```
+
+## Adding Your Own Metrics
+
+To add your own metrics, you have to [create an extension](https://docs.directus.io/extensions/creating-extensions.html).
+Most likely you'd want to create a hook extension but `directus-extension-prometheus` should be available from any api extension.
+
+Usage:
+
+```javascript
+const {globalRegister} = require('directus-extension-prometheus');
+const {Counter} = require("prom-client");
+
+module.exports = {
+    default: ({init}) => {
+        // here I use the app.before hook to register this metric as soon as the app starts
+        init('app.before', () => {
+            const count = new Counter({
+                registers: [globalRegister],
+                name: 'timey_wimey',
+                help: 'People assume that time is a strict progression from cause to effect, but actually from a non-linear, non-subjective viewpoint, it’s more like a big ball of wibbly-wobbly, timey-wimey stuff.'
+            });
+
+            // increment the counter every second
+            setInterval(() => {
+                count.inc();
+            }, 1000);
+        });
+    }
+}
 ```

@@ -17,6 +17,7 @@
     "name": "Thomas Biesart",
     "url": "https://github.com/chappio"
   },
+  "main": "./dist/index.js",
   "files": [
     "dist",
     "README.md"
@@ -28,9 +29,8 @@
     "host": "^9.22.4"
   },
   "scripts": {
-    "prepack": "directus-extension build",
-    "dev": "directus-extension build -w --no-minify",
-    "link": "directus-extension link"
+    "prepack": "tsc",
+    "dev": "tsc --watch"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "9.22.4",
