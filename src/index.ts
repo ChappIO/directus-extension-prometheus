@@ -2,9 +2,9 @@ import {defineHook} from '@directus/extensions-sdk';
 import {Counter, Gauge, Histogram, Registry} from "prom-client";
 import {NextFunction, Request, Response} from "express";
 
-const globalRegister = new Registry();
+export const globalRegister = new Registry();
 
-const hook = defineHook(({init}, {services, getSchema, database, env}) => {
+export default defineHook(({init}, {services, getSchema, database, env}) => {
     const PROMETHEUS_METRICS_ENDPOINT = env.PROMETHEUS_METRICS_ENDPOINT || '/metrics';
 
     init('app.before', async ({app}) => {
@@ -85,8 +85,3 @@ const hook = defineHook(({init}, {services, getSchema, database, env}) => {
         });
     });
 });
-
-module.exports = {
-    default: hook,
-    globalRegister: globalRegister,
-}

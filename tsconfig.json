@@ -25,7 +25,8 @@
 		"isolatedModules": true,
 		"rootDir": "./src",
 		"declaration": true,
-		"outDir": "dist"
+		"outDir": "dist",
+		"emitDeclarationOnly": true,
 	},
 	"include": [
       "./src/**/*.ts"
