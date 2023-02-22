@@ -72,9 +72,10 @@ export default defineHook(({init}, {services, getSchema, database, logger, env})
                         .map(async (collection: string) => {
                             const count = await meta.totalCount(collection);
                             collectionSize.labels({collection}).set(count);
-                        }).catch((e: any) => {
-                            logger.debug(e)
                         })
+                        .map((result: Promise<any>) => result.catch((e: any) => {
+                            logger.debug(e)
+                        }))
                 )
 
                 await Promise.all(jobs);
