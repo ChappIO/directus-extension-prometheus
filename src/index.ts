@@ -4,7 +4,7 @@ import {NextFunction, Request, Response} from "express";
 
 export const globalRegister = new Registry();
 
-export default defineHook(({init}, {services, getSchema, database, env}) => {
+export default defineHook(({init}, {services, getSchema, database, logger, env}) => {
     const PROMETHEUS_METRICS_ENDPOINT = env.PROMETHEUS_METRICS_ENDPOINT || '/metrics';
 
     init('app.before', async ({app}) => {
@@ -72,6 +72,8 @@ export default defineHook(({init}, {services, getSchema, database, env}) => {
                         .map(async (collection: string) => {
                             const count = await meta.totalCount(collection);
                             collectionSize.labels({collection}).set(count);
+                        }).catch((e: any) => {
+                            logger.debug(e)
                         })
                 )
 
