@@ -17,27 +17,16 @@
     "name": "Thomas Biesart",
     "url": "https://github.com/chappio"
   },
-  "main": "./dist/index.js",
+  "main": "./src/index.js",
   "files": [
-    "dist",
+    "src",
     "README.md"
   ],
   "directus:extension": {
     "type": "hook",
-    "path": "dist/index.js",
-    "source": "src/index.ts",
-    "host": "^9.22.4"
-  },
-  "scripts": {
-    "prepack": "directus-extension build && tsc",
-    "dev": "directus-extension build -w --no-minify",
-    "link": "directus-extension link"
-  },
-  "devDependencies": {
-    "@directus/extensions-sdk": "9.22.4",
-    "@types/express": "^4.17.17",
-    "@types/node": "^18.13.0",
-    "typescript": "^4.9.5"
+    "path": "src/index.js",
+    "source": "src/index.js",
+    "host": "^9.26.0"
   },
   "dependencies": {
     "prom-client": "^14.1.1"

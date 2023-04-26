@@ -1,10 +1,7 @@
-import {defineHook} from '@directus/extensions-sdk';
-import {Counter, Gauge, Histogram, Registry} from "prom-client";
-import {NextFunction, Request, Response} from "express";
+const {Counter, Gauge, Histogram, Registry} = require("prom-client");
+const globalRegister = new Registry();
 
-export const globalRegister = new Registry();
-
-export default defineHook(({init}, {services, getSchema, database, logger, env}) => {
+const initHooks = ({init}, {services, getSchema, database, logger, env}) => {
     const PROMETHEUS_METRICS_ENDPOINT = env.PROMETHEUS_METRICS_ENDPOINT || '/metrics';
 
     init('app.before', async ({app}) => {
@@ -20,7 +17,7 @@ export default defineHook(({init}, {services, getSchema, database, logger, env})
             registers: [globalRegister],
             labelNames: ['method', 'status']
         });
-        app.use('/', (req: Request, res: Response, next: NextFunction) => {
+        app.use('/', (req, res, next) => {
             const recordDuration = requestDuration.startTimer({
                 method: req.method
             });
@@ -61,23 +58,20 @@ export default defineHook(({init}, {services, getSchema, database, logger, env})
             labelNames: ['collection']
         });
 
-        app.use(PROMETHEUS_METRICS_ENDPOINT, async (_req: Request, res: Response, next: NextFunction) => {
+        app.use(PROMETHEUS_METRICS_ENDPOINT, async (req, res, next) => {
             try {
-                let jobs = [];
+                const allCollections = await collections.readByQuery();
 
-                // get collection count
-                jobs.push(
-                    ...(await collections.readByQuery())
-                        .map((c: any) => c.collection)
-                        .map(async (collection: string) => {
+                await Promise.all(allCollections
+                    .map((c) => c.collection)
+                    .map(async (collection) => {
+                        try {
                             const count = await meta.totalCount(collection);
                             collectionSize.labels({collection}).set(count);
-                        }).catch((e: any) => {
-                            logger.debug(e)
-                        })
-                )
-
-                await Promise.all(jobs);
+                        } catch (e) {
+                            logger.debug(e);
+                        }
+                    }));
                 res.set('Content-Type', globalRegister.contentType);
                 res.send(await globalRegister.metrics());
             } catch (e) {
@@ -86,4 +80,7 @@ export default defineHook(({init}, {services, getSchema, database, logger, env})
             }
         });
     });
-});
+};
+
+module.exports = initHooks;
+module.exports.globalRegister = globalRegister;
