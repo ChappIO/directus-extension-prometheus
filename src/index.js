@@ -11,14 +11,34 @@ const initHooks = ({init}, {services, getSchema, database, logger, env}) => {
             registers: [globalRegister],
             labelNames: ['method', 'status']
         });
+
+        const itemsRequestCount = new Counter({
+            name: 'directus_items_request_count',
+            help: 'The number of http requests to directus items',
+            registers: [globalRegister],
+            labelNames: ['method', 'status', 'collection']
+        });
+
         const requestDuration = new Histogram({
             name: 'directus_request_duration_seconds',
             help: 'The total duration of http requests',
             registers: [globalRegister],
             labelNames: ['method', 'status']
         });
+
+        const itemsRequestDuration = new Histogram({
+            name: 'directus_items_request_duration_seconds',
+            help: 'The total duration of http requests to directus items',
+            registers: [globalRegister],
+            labelNames: ['method', 'status', 'collection']
+        });
+
         app.use('/', (req, res, next) => {
             const recordDuration = requestDuration.startTimer({
+                method: req.method
+            });
+
+            const recordItemsDuration = itemsRequestDuration.startTimer({
                 method: req.method
             });
 
@@ -31,6 +51,19 @@ const initHooks = ({init}, {services, getSchema, database, logger, env}) => {
                 recordDuration({
                     status,
                 });
+
+                if (req.collection && !req.collection.startsWith('directus_')) {
+                    itemsRequestCount.labels({
+                        status,
+                        method: req.method,
+                        collection: req.collection
+                    }).inc(1);
+
+                    recordItemsDuration({
+                        status,
+                        collection: req.collection
+                    });
+                }
             });
             next();
         });
